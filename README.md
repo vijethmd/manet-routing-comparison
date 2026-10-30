@@ -1,7 +1,6 @@
 # Performance Analysis of AODV in a MANET Using NS-3: Comparison with OLSR and DSDV
 
-This project extends the Team 11 Network Programming AAT project
-[tanmayagr2021/manet-aodv-project](https://github.com/tanmayagr2021/manet-aodv-project).
+This project extends the Team 11 Network Programming AAT project.
 The original project measured how the **AODV** routing protocol performs in a mobile ad hoc network
 (MANET) when the number of nodes, the node speed and the traffic load change. This version keeps that
 study exactly (AODV results are identical, run for run) and adds:
