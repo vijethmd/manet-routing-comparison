@@ -1,0 +1,27 @@
+==============================================================
+ AODV MANET Simulation Results (ns-3.48)
+==============================================================
+ Parameters
+   Routing protocol    : AODV
+   Nodes               : 5
+   Simulation time     : 60.000 s (traffic 2.000 s - 59.000 s)
+   Area                : 700.000 m x 700.000 m
+   Radio range         : 250.000 m
+   Node speed / pause  : 5.000 m/s / 0.000 s
+   Packet size         : 512 bytes
+   Packet rate         : 4.000 packets/s
+   Source -> Dest      : node 0 (10.1.1.1) -> node 4 (10.1.1.5)
+   Seed / run          : 1 / 3
+ Metrics
+   Transmitted packets : 228
+   Received packets    : 205
+   Lost packets        : 23 (10.088 %)
+   Dropped at source   : 0 (no route)
+   Packet Delivery Ratio : 89.912 %
+   Throughput          : 15.537 kbps
+   Average E2E delay   : 226.987 ms
+   Average jitter      : 46.289 ms
+ Routing overhead
+   Control packets     : 314 (15172 bytes)
+   Normalised load     : 1.532 control packets per delivered packet
+==============================================================

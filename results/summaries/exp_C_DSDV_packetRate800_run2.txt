@@ -1,0 +1,27 @@
+==============================================================
+ DSDV MANET Simulation Results (ns-3.48)
+==============================================================
+ Parameters
+   Routing protocol    : DSDV
+   Nodes               : 10
+   Simulation time     : 60.000 s (traffic 2.000 s - 59.000 s)
+   Area                : 700.000 m x 700.000 m
+   Radio range         : 250.000 m
+   Node speed / pause  : 5.000 m/s / 0.000 s
+   Packet size         : 512 bytes
+   Packet rate         : 800.000 packets/s
+   Source -> Dest      : node 0 (10.1.1.1) -> node 9 (10.1.1.10)
+   Seed / run          : 1 / 2
+ Metrics
+   Transmitted packets : 45600
+   Received packets    : 14329
+   Lost packets        : 31271 (68.577 %)
+   Dropped at source   : 0 (no route)
+   Packet Delivery Ratio : 31.423 %
+   Throughput          : 1085.987 kbps
+   Average E2E delay   : 537.403 ms
+   Average jitter      : 1.928 ms
+ Routing overhead
+   Control packets     : 291 (17532 bytes)
+   Normalised load     : 0.020 control packets per delivered packet
+==============================================================

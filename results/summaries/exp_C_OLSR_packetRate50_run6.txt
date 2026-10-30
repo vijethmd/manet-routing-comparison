@@ -1,0 +1,27 @@
+==============================================================
+ OLSR MANET Simulation Results (ns-3.48)
+==============================================================
+ Parameters
+   Routing protocol    : OLSR
+   Nodes               : 10
+   Simulation time     : 60.000 s (traffic 2.000 s - 59.000 s)
+   Area                : 700.000 m x 700.000 m
+   Radio range         : 250.000 m
+   Node speed / pause  : 5.000 m/s / 0.000 s
+   Packet size         : 512 bytes
+   Packet rate         : 50.000 packets/s
+   Source -> Dest      : node 0 (10.1.1.1) -> node 9 (10.1.1.10)
+   Seed / run          : 1 / 6
+ Metrics
+   Transmitted packets : 2850
+   Received packets    : 737
+   Lost packets        : 2113 (74.140 %)
+   Dropped at source   : 1554 (no route)
+   Packet Delivery Ratio : 25.860 %
+   Throughput          : 55.857 kbps
+   Average E2E delay   : 3.401 ms
+   Average jitter      : 1.465 ms
+ Routing overhead
+   Control packets     : 338 (30472 bytes)
+   Normalised load     : 0.459 control packets per delivered packet
+==============================================================
