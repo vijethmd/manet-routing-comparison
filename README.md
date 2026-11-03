@@ -216,6 +216,7 @@ pairwise tests in `results/csv/protocol_tests.csv`.
 | `submissions/NP_AAT_Report_Team11_AODV_OLSR_DSDV.pdf` | AAT report (25 pages) following the AAT Report Guidelines 2026-27 |
 | `submissions/NP_AAT_Report_Team11_AODV_OLSR_DSDV.docx` | Editable Word version of the report |
 | `submissions/AODV_OLSR_DSDV_MANET_Team11.pptx` | 17-slide presentation with speaker notes |
+| `submissions/AODV_OLSR_DSDV_MANET_Team11.pdf` | The same presentation as PDF |
 
 
 ## Limitations
