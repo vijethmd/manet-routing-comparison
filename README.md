@@ -80,7 +80,7 @@ manet-routing-comparison/
 │   ├── csv/                    one row per run, averages, test results
 │   ├── graphs/                 PNG graphs (one line per protocol)
 │   └── summaries/              text summary of every run
-└── report/                     AAT report (PDF and Word)
+└── submissions/                AAT report (PDF and Word) and presentation
 ```
 
 ## 5. Running
@@ -213,9 +213,9 @@ pairwise tests in `results/csv/protocol_tests.csv`.
 
 | File | Contents |
 |---|---|
-| `report/NP_AAT_Report_Team11_AODV_OLSR_DSDV.pdf` | AAT report (26 pages) following the AAT Report Guidelines 2026-27 |
-| `report/NP_AAT_Report_Team11_AODV_OLSR_DSDV.docx` | Editable Word version of the report |
-| `presentation/AODV_OLSR_DSDV_MANET_Team11.pptx` | 17-slide presentation with speaker notes |
+| `submissions/NP_AAT_Report_Team11_AODV_OLSR_DSDV.pdf` | AAT report (25 pages) following the AAT Report Guidelines 2026-27 |
+| `submissions/NP_AAT_Report_Team11_AODV_OLSR_DSDV.docx` | Editable Word version of the report |
+| `submissions/AODV_OLSR_DSDV_MANET_Team11.pptx` | 17-slide presentation with speaker notes |
 
 
 ## Limitations
