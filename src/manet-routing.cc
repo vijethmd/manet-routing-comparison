@@ -53,9 +53,10 @@
  *   NRL         : Normalised Routing Load = Ctrl packets / Rx packets
  *                 (control packets sent per data packet delivered).
  *
- * USAGE (from ~/Documents/NP AAT/manet-aodv-project, see HOW_TO_RUN.md)
+ * USAGE (from the project folder, see README.md)
  * -----
  *   ./scripts/run_single.sh --protocol=OLSR --nodes=10 --simTime=60 --speed=5
+ *   ./scripts/run_single.sh --protocol=AODV --run=2 --animate   (writes a NetAnim file)
  *   ./scripts/run_single.sh --PrintHelp     (lists every option)
  */
 
@@ -66,6 +67,7 @@
 #include "ns3/flow-monitor-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/mobility-module.h"
+#include "ns3/netanim-module.h"
 #include "ns3/network-module.h"
 #include "ns3/olsr-module.h"
 #include "ns3/wifi-module.h"
@@ -73,6 +75,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <sstream>
 
 using namespace ns3;
@@ -135,6 +138,8 @@ main(int argc, char* argv[])
     std::string experiment = "single"; // label written into the CSV
     std::string csvFile = "results/csv/single_results.csv";
     std::string summaryFile = "results/summaries/single_summary.txt";
+    bool animate = false; // write a NetAnim animation (slows the run; off for experiments)
+    std::string animFile = "results/netanim/manet-routing.xml";
 
     CommandLine cmd(__FILE__);
     cmd.AddValue("nodes", "Number of mobile nodes (>= 2)", nNodes);
@@ -151,6 +156,9 @@ main(int argc, char* argv[])
     cmd.AddValue("experiment", "Experiment label stored in the CSV", experiment);
     cmd.AddValue("csv", "CSV file to append results to", csvFile);
     cmd.AddValue("summary", "Human-readable summary file (empty = none)", summaryFile);
+    cmd.AddValue("animate", "Write a NetAnim animation file", animate);
+    cmd.AddValue("animFile", "NetAnim animation file (routing tables go to <name>-routes.xml)",
+                 animFile);
     cmd.Parse(argc, argv);
 
     if (protocol == "AODV")
@@ -329,8 +337,35 @@ main(int argc, char* argv[])
     clientApp.Stop(Seconds(trafficStop));
 
     // ------------------------------------------------------------------
-    // 7. FlowMonitor + run the simulation
+    // 7. Optional NetAnim animation, then FlowMonitor + run the simulation
     // ------------------------------------------------------------------
+    // NetAnim replays node movement and every packet (data and routing).
+    // Source = green, destination = red, relays = blue.
+    std::unique_ptr<AnimationInterface> anim;
+    if (animate)
+    {
+        const std::string base = animFile.size() > 4 && animFile.substr(animFile.size() - 4) == ".xml"
+                                     ? animFile.substr(0, animFile.size() - 4)
+                                     : animFile;
+        anim = std::make_unique<AnimationInterface>(animFile);
+        anim->SetMobilityPollInterval(Seconds(0.25));
+        anim->EnablePacketMetadata(true); // show packet types, e.g. RREQ, HELLO, UDP data
+        anim->EnableIpv4RouteTracking(base + "-routes.xml",
+                                      Seconds(0),
+                                      Seconds(simTime),
+                                      Seconds(1));
+        for (uint32_t i = 0; i < nNodes; ++i)
+        {
+            anim->UpdateNodeDescription(nodes.Get(i), "n" + std::to_string(i));
+            anim->UpdateNodeSize(nodes.Get(i), 18, 18);
+            anim->UpdateNodeColor(nodes.Get(i), 60, 120, 210);
+        }
+        anim->UpdateNodeDescription(nodes.Get(srcIndex), "SOURCE n" + std::to_string(srcIndex));
+        anim->UpdateNodeColor(nodes.Get(srcIndex), 0, 170, 80);
+        anim->UpdateNodeDescription(nodes.Get(dstIndex), "DEST n" + std::to_string(dstIndex));
+        anim->UpdateNodeColor(nodes.Get(dstIndex), 220, 50, 50);
+    }
+
     FlowMonitorHelper flowHelper;
     Ptr<FlowMonitor> monitor = flowHelper.InstallAll();
 

@@ -53,7 +53,7 @@ mkdir -p ~/ns3-project && cd ~/ns3-project
 git clone --depth 1 --branch ns-3.48 https://gitlab.com/nsnam/ns-3-dev.git ns-3
 cd ns-3
 ./ns3 configure -d optimized --disable-examples --disable-tests --disable-python-bindings \
-    --enable-modules="aodv;olsr;dsdv;flow-monitor;wifi;mobility;internet;applications"
+    --enable-modules="aodv;olsr;dsdv;flow-monitor;wifi;mobility;internet;applications;netanim"
 
 # 2. Link this project's src/ folder into ns-3's scratch/ folder
 ln -s /path/to/manet-routing-comparison/src scratch/manet-routing
@@ -73,12 +73,14 @@ manet-routing-comparison/
 ├── src/manet-routing.cc        the simulation (C++)
 ├── scripts/
 │   ├── run_single.sh           build + run one simulation
+│   ├── animate.sh              one simulation as a NetAnim animation, then opens NetAnim
 │   ├── plot_results.py         graphs + mean/SD/95% CI tables
 │   └── analyse.py              paired significance tests between protocols
 ├── run_experiments.sh          runs experiments A, B, C for every protocol, then plots
 ├── results/
 │   ├── csv/                    one row per run, averages, test results
 │   ├── graphs/                 PNG graphs (one line per protocol)
+│   ├── netanim/                ready-made NetAnim animations (AODV, OLSR, DSDV; run 2)
 │   └── summaries/              text summary of every run
 └── submissions/                AAT report (PDF and Word) and presentation
 ```
@@ -107,6 +109,33 @@ python3 scripts/analyse.py              # significance tests
 | `--area` / `--range` | side of the square area / radio range (m) | 700 / 250 |
 | `--seed` / `--run` | random seed / run number (same values = same result) | 1 / 1 |
 | `--experiment`, `--csv`, `--summary` | CSV label, CSV file, summary file | single, results/csv/single_results.csv, results/summaries/single_summary.txt |
+| `--animate` / `--animFile` | write a NetAnim animation / its file (routing tables go to `<name>-routes.xml`) | off / results/netanim/manet-routing.xml |
+
+### Watching the simulation in NetAnim
+
+NetAnim, ns-3's animator, replays a run: the nodes move around the area and every packet (data and
+routing) is drawn as an arrow between nodes. The source is green, the destination red and the relays blue.
+The animation does not change the results: the numbers are identical with and without `--animate`.
+
+Build NetAnim once (macOS with Homebrew; it needs Qt 6):
+
+```bash
+brew install qtbase
+cd ~/ns3-project
+git clone --depth 1 --branch netanim-3.110 https://gitlab.com/nsnam/netanim.git
+cd netanim && cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j
+```
+
+Then, from the project folder:
+
+```bash
+./scripts/animate.sh AODV 2     # simulate AODV on topology 2 and open NetAnim
+./scripts/animate.sh OLSR 2     # the same topology with OLSR
+```
+
+In NetAnim, click the folder icon (Open XML trace file), choose the file the script printed
+(for example `results/netanim/aodv-run2.xml`), and press Play. Ready-made animations for AODV, OLSR and
+DSDV on topology 2 are already in `results/netanim/`, so NetAnim can open them without running anything.
 
 ## 6. Metrics
 
