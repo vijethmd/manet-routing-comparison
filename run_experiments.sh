@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Run all MANET experiments for AODV, OLSR and DSDV and draw the graphs.
+# Run all MANET experiments for AODV, OLSR, DSDV and AH-AODV and draw the graphs.
 #
 #   Experiment A: number of nodes   (5, 10, 15, 20)       speed 5 m/s, 4 pkt/s
 #   Experiment B: node speed        (1, 5, 10, 15 m/s)    10 nodes,   4 pkt/s
@@ -16,13 +16,14 @@
 #   ./run_experiments.sh A          # run only experiment A (also B / C)
 #   RUNS=5 SIM_TIME=100 ./run_experiments.sh
 #   PROTOCOLS="AODV OLSR" ./run_experiments.sh
+#   PROTOCOLS="AH-AODV" ./run_experiments.sh   # rerun one protocol, keep the others' rows
 #
 set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 NS3_DIR="${NS3_DIR:-$HOME/ns3-project/ns-3}"
 RUNS="${RUNS:-10}"           # repetitions per parameter value
-PROTOCOLS="${PROTOCOLS:-AODV OLSR DSDV}"
+PROTOCOLS="${PROTOCOLS:-AODV OLSR DSDV AH-AODV}"
 SIM_TIME="${SIM_TIME:-60}"   # seconds
 PACKET_SIZE="${PACKET_SIZE:-512}"
 WHICH="${1:-all}"
@@ -57,7 +58,15 @@ run_experiment() {
     shift
     local fixed="$*"
     local csv="results/csv/$csvname"
-    rm -f "$PROJECT_DIR/$csv" "$SUM_DIR"/exp_"$label"_*.txt
+    # Remove earlier results of the protocols being run; keep the other protocols' rows.
+    if [ -f "$PROJECT_DIR/$csv" ]; then
+        awk -F, -v drop=" $PROTOCOLS " 'NR == 1 || index(drop, " " $2 " ") == 0' \
+            "$PROJECT_DIR/$csv" > "$PROJECT_DIR/$csv.tmp"
+        mv "$PROJECT_DIR/$csv.tmp" "$PROJECT_DIR/$csv"
+    fi
+    for proto in $PROTOCOLS; do
+        rm -f "$SUM_DIR"/exp_"$label"_"$proto"_*.txt
+    done
     echo ">>> Experiment $label: varying --$option over (${values[*]}), $RUNS runs each, protocols: $PROTOCOLS"
     for proto in $PROTOCOLS; do
         for v in "${values[@]}"; do

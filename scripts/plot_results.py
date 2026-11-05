@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Plot the AODV / OLSR / DSDV MANET experiment results (used ONLY for analysis/plotting).
+Plot the AODV / OLSR / DSDV / AH-AODV MANET experiment results (used ONLY for analysis/plotting).
 
 Reads the CSV files written by run_experiments.sh:
     results/csv/exp_A_nodes.csv   (varying number of nodes)
@@ -44,8 +44,8 @@ METRICS = {
 SHORT = {"pdr_pct": "pdr", "throughput_kbps": "throughput", "avg_delay_ms": "delay",
          "avg_jitter_ms": "jitter", "lost_packets": "packet_loss", "loss_ratio_pct": "loss_ratio",
          "ctrl_packets": "overhead", "nrl": "nrl"}
-COLORS = {"AODV": "#1f5fa8", "OLSR": "#c8611b", "DSDV": "#2e8b57"}
-MARKERS = {"AODV": "o", "OLSR": "s", "DSDV": "^"}
+COLORS = {"AODV": "#1f5fa8", "OLSR": "#c8611b", "DSDV": "#2e8b57", "AH-AODV": "#8e3fb0"}
+MARKERS = {"AODV": "o", "OLSR": "s", "DSDV": "^", "AH-AODV": "D"}
 
 # (csv file, x column, x label, file prefix, metrics to plot)
 EXPERIMENTS = [
@@ -69,10 +69,11 @@ def ci95(series):
 def plot_one(mean, std, x, xlabel, metric, out_file, logx=False):
     fig, ax = plt.subplots(figsize=(6, 4))
     span = mean[x].max() - mean[x].min()
-    for i, (proto, m) in enumerate(mean.groupby("protocol")):
+    groups = list(mean.groupby("protocol"))
+    for i, (proto, m) in enumerate(groups):
         s = std[std["protocol"] == proto]
         yerr = s[metric].fillna(0) if metric == "pdr_pct" else None
-        shift = i - 1  # nudge the protocols apart so their error bars do not overlap
+        shift = i - (len(groups) - 1) / 2  # nudge the protocols apart so error bars do not overlap
         xs = m[x] * 1.06 ** shift if logx else m[x] + 0.012 * span * shift
         ax.errorbar(xs, m[metric], yerr=yerr, marker=MARKERS.get(proto, "o"), capsize=4,
                     linewidth=2, color=COLORS.get(proto), label=proto, elinewidth=1, alpha=0.9)

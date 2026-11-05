@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Statistical summary of the AODV / OLSR / DSDV experiments.
+Statistical summary of the AODV / OLSR / DSDV / AH-AODV experiments.
 
 For every experiment, protocol and parameter value it prints the mean, standard
 deviation and 95% confidence interval of each metric, and it compares the

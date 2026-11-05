@@ -3,7 +3,8 @@
  * Mobile Ad Hoc Network (MANET) Using NS-3
  *
  * Written for ns-3.48. Extends the AODV study (manet-aodv.cc) with a choice of
- * routing protocol, routing overhead and jitter.
+ * routing protocol, routing overhead and jitter, and with AH-AODV (Adaptive-Hello AODV),
+ * the team's AODV variant in ah-aodv-*.cc.
  *
  * SCENARIO
  * --------
@@ -14,6 +15,9 @@
  *       AODV  Ad hoc On-Demand Distance Vector   reactive        UDP port 654
  *       OLSR  Optimized Link State Routing       proactive       UDP port 698
  *       DSDV  Destination-Sequenced Distance-Vector  proactive   UDP port 269
+ *       AH-AODV  Adaptive-Hello AODV: AODV whose Hello interval doubles (up to
+ *             --maxHello s) while no neighbour joins or leaves, and returns to
+ *             1 s as soon as one does                 reactive        UDP port 654
  *   - Nodes move with the Random Waypoint mobility model: each node picks a
  *     random destination in the area, walks there at the configured speed,
  *     pauses, and repeats.
@@ -59,6 +63,8 @@
  *   ./scripts/run_single.sh --protocol=AODV --run=2 --animate   (writes a NetAnim file)
  *   ./scripts/run_single.sh --PrintHelp     (lists every option)
  */
+
+#include "ah-aodv-helper.h"
 
 #include "ns3/aodv-module.h"
 #include "ns3/applications-module.h"
@@ -134,7 +140,10 @@ main(int argc, char* argv[])
     double range = 250.0;       // Wi-Fi transmission range (m)
     uint32_t seed = 1;          // random seed
     uint32_t run = 1;           // run number (different run = different random scenario)
-    std::string protocol = "AODV";     // routing protocol: AODV, OLSR or DSDV
+    std::string protocol = "AODV";     // routing protocol: AODV, OLSR, DSDV or AH-AODV
+    bool adaptiveHello = true;         // AH-AODV: adapt the Hello interval (false = plain AODV)
+    double maxHello = 4.0;             // AH-AODV: largest Hello interval (s)
+    bool activeRouteHello = true;      // AH-AODV: nodes carrying unicast traffic keep 1 s Hellos
     std::string experiment = "single"; // label written into the CSV
     std::string csvFile = "results/csv/single_results.csv";
     std::string summaryFile = "results/summaries/single_summary.txt";
@@ -152,7 +161,14 @@ main(int argc, char* argv[])
     cmd.AddValue("range", "Wi-Fi transmission range in m", range);
     cmd.AddValue("seed", "Random seed", seed);
     cmd.AddValue("run", "Random run number", run);
-    cmd.AddValue("protocol", "Routing protocol: AODV, OLSR or DSDV", protocol);
+    cmd.AddValue("protocol", "Routing protocol: AODV, OLSR, DSDV or AH-AODV", protocol);
+    cmd.AddValue("adaptiveHello", "AH-AODV: adapt the Hello interval (false = behave like AODV)",
+                 adaptiveHello);
+    cmd.AddValue("maxHello", "AH-AODV: largest Hello interval in s", maxHello);
+    cmd.AddValue("activeRouteHello",
+                 "AH-AODV: nodes that sent, forwarded or received unicast in the last 3 s keep "
+                 "1 s Hellos",
+                 activeRouteHello);
     cmd.AddValue("experiment", "Experiment label stored in the CSV", experiment);
     cmd.AddValue("csv", "CSV file to append results to", csvFile);
     cmd.AddValue("summary", "Human-readable summary file (empty = none)", summaryFile);
@@ -161,7 +177,7 @@ main(int argc, char* argv[])
                  animFile);
     cmd.Parse(argc, argv);
 
-    if (protocol == "AODV")
+    if (protocol == "AODV" || protocol == "AH-AODV")
     {
         g_routingPort = 654;
     }
@@ -175,7 +191,7 @@ main(int argc, char* argv[])
     }
     else
     {
-        std::cerr << "Invalid --protocol=" << protocol << " (use AODV, OLSR or DSDV)" << std::endl;
+        std::cerr << "Invalid --protocol=" << protocol << " (use AODV, OLSR, DSDV or AH-AODV)" << std::endl;
         return 1;
     }
 
@@ -266,10 +282,18 @@ main(int argc, char* argv[])
     AodvHelper aodv;
     OlsrHelper olsr;
     DsdvHelper dsdv;
+    AhAodvHelper ahAodv;
+    ahAodv.Set("AdaptiveHello", BooleanValue(adaptiveHello));
+    ahAodv.Set("MaxHelloInterval", TimeValue(Seconds(maxHello)));
+    ahAodv.Set("ActiveRouteHello", BooleanValue(activeRouteHello));
     InternetStackHelper internet;
     if (protocol == "AODV")
     {
         internet.SetRoutingHelper(aodv);
+    }
+    else if (protocol == "AH-AODV")
+    {
+        internet.SetRoutingHelper(ahAodv);
     }
     else if (protocol == "OLSR")
     {
@@ -293,6 +317,10 @@ main(int argc, char* argv[])
     if (protocol == "AODV")
     {
         stream += aodv.AssignStreams(nodes, stream);
+    }
+    else if (protocol == "AH-AODV")
+    {
+        stream += ahAodv.AssignStreams(nodes, stream);
     }
     else if (protocol == "OLSR")
     {
